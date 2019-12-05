@@ -34,9 +34,9 @@ fn makeEntry(
         .num_of_funcs = functions,
         .funcs = &nif_funcs,
         .load = load,
-        .reload = null,
-        .upgrade = null,
-        .unload = null,
+        .reload = reload,
+        .upgrade = upgrade,
+        .unload = unload,
         .vm_variant = "beam.vanilla",
         .options = 1,
         .sizeof_ErlNifResourceTypeInit = @sizeOf(erl.ErlNifResourceTypeInit),
@@ -63,4 +63,4 @@ const UpgradeFunction = extern fn (
     load_info: erl.ERL_NIF_TERM,
 ) c_int;
 
-const UnloadFunction = extern fn (env: ?*erl.ErlNifEnv, priv_data: ?*c_void) c_int;
+const UnloadFunction = extern fn (env: ?*erl.ErlNifEnv, priv_data: ?*c_void) void;
