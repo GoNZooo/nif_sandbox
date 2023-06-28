@@ -1,4 +1,4 @@
-const nif_utilities = @import("./nif_utilities.zig");
+const nif_utilities = @import("nif_utilities.zig");
 const erlang = nif_utilities.erlang;
 
 var entry: erlang.ErlNifEntry = nif_utilities.makeEntry(
@@ -19,10 +19,13 @@ export fn hello(
     argc: c_int,
     argv: [*c]const c_ulong,
 ) erlang.ERL_NIF_TERM {
+    _ = argv;
+    _ = argc;
+
     return erlang.enif_make_string(
         env,
         "Hello World from Zig!",
-        erlang.ErlNifCharEncoding.ERL_NIF_LATIN1,
+        erlang.ERL_NIF_LATIN1,
     );
 }
 
