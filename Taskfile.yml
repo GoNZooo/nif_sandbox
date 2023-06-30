@@ -22,7 +22,8 @@ tasks:
       - build_c
       - build_odin
       - build_zig
-    aliases: [b]
+    aliases: 
+      - b
 
   build_odin:
     cmds:
@@ -57,7 +58,8 @@ tasks:
   tests:
     deps:
       - elixir_tests
-    aliases: [t]
+    aliases: 
+      - t
   elixir_tests:
     deps:
       - build
@@ -66,7 +68,8 @@ tasks:
     sources:
       - ./test/*
     silent: true
-    aliases: [et]
+    aliases:
+      - et
   clean:
     cmds:
       - rm -rf ./nif/obj
