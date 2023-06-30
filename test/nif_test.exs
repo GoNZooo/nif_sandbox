@@ -16,7 +16,7 @@ defmodule NifTest do
 
   test "odin nifs" do
     assert OdinNif.hello() == 'Hello World from Odin!'
-    assert OdinNif.hello_binary(42) == "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    assert OdinNif.hello_binary(42) == "oooooooooooooooooooooooooooooooooooooooooo"
     assert_raise ArgumentError, fn -> OdinNif.hello_binary(4.0) end
   end
 

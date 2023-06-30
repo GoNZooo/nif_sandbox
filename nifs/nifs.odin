@@ -33,7 +33,7 @@ hello_binary :: proc "c" (
 
   bytes := make([]u8, int_value)
   for &c in bytes {
-    c = 'a'
+    c = 'o'
   }
   binary := erldin.ErlNifBinary {
     size = c.size_t(int_value),

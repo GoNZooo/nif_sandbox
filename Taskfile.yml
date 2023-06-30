@@ -55,15 +55,17 @@ tasks:
     silent: true
 
   tests:
-    deps: [main_tests]
+    deps:
+      - elixir_tests
     aliases: [t]
-  main_tests:
+  elixir_tests:
+    deps:
+      - build
     cmds:
-      - odin run erldin_tests
-    silent: true
+      - mix test
     sources:
-      - ./erldin/*
-      - ./erldin_tests/*
+      - ./test/*
+    silent: true
     aliases: [et]
   clean:
     cmds:
