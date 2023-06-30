@@ -27,29 +27,29 @@ tasks:
   build_odin:
     cmds:
       - mkdir -p ./nif/obj/odin
-      - odin build hello_from_odin -reloc-mode=pic -build-mode:shared -out:nif/obj/odin/hello_from_odin.so
+      - odin build nifs -reloc-mode=pic -build-mode:shared -out:nif/obj/odin/nifs.so
     generates:
-      - ./nif/obj/odin/hello_from_odin.so
+      - ./nif/obj/odin/nifs.so
     sources:
-      - ./hello_from_odin/*
+      - ./nifs/*
     silent: true
 
   build_c:
     cmds:
       - mkdir -p ./nif/obj/c
-      - gcc -fpic -shared -I $ERL_HEADERS -o nif/obj/c/hello_world.so nif/c/hello_world.c
+      - gcc -fpic -shared -I $ERL_HEADERS -o nif/obj/c/nifs.so nif/c/*.c
     generates:
-      - ./nif/obj/c/hello_world.so
+      - ./nif/obj/c/nifs.so
     sources:
-      - ./nif/c/hello_world.c
+      - ./nif/c/*.c
     silent: true
 
   build_zig:
     cmds:
       - mkdir -p ./nif/obj/zig
-      - zig build-lib --library c -dynamic -fPIC  -I $ERL_HEADERS -femit-bin=nif/obj/zig/libzig_hello_world.so nif/zig/hello_world.zig
+      - zig build-lib --library c -dynamic -fPIC  -I $ERL_HEADERS -femit-bin=nif/obj/zig/nifs.so nif/zig/nifs.zig
     generates:
-      - nif/obj/zig/libzig_hello_world.so
+      - nif/obj/zig/nifs.so
     sources:
       - ./nif/zig/*.zig
     silent: true
