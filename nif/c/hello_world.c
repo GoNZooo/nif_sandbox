@@ -30,4 +30,4 @@ static ERL_NIF_TERM hello_binary(ErlNifEnv *env, int argc,
 static ErlNifFunc nif_funcs[] = {{"hello", 0, hello},
                                  {"hello_binary", 1, hello_binary}};
 
-ERL_NIF_INIT(Elixir.HelloWorldInC, nif_funcs, NULL, NULL, NULL, NULL);
+ERL_NIF_INIT(Elixir.CNif, nif_funcs, NULL, NULL, NULL, NULL);

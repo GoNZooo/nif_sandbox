@@ -10,27 +10,30 @@ tasks:
     cmds:
       - task: build
     silent: true
+
   iex:
     deps:
       - build
     cmds:
       - iex -S mix
+
   build:
     deps:
       - build_c
       - build_odin
       - build_zig
     aliases: [b]
+
   build_odin:
     cmds:
       - mkdir -p ./nif/obj/odin
-      - odin build hello_from_odin -reloc-mode=pic -build-mode:shared
-      - mv hello_from_odin.so ./nif/obj/odin/hello_from_odin.so
+      - odin build hello_from_odin -reloc-mode=pic -build-mode:shared -out:nif/obj/odin/hello_from_odin.so
     generates:
-      - ./hello_from_odin.so
+      - ./nif/obj/odin/hello_from_odin.so
     sources:
       - ./hello_from_odin/*
     silent: true
+
   build_c:
     cmds:
       - mkdir -p ./nif/obj/c
@@ -40,15 +43,17 @@ tasks:
     sources:
       - ./nif/c/hello_world.c
     silent: true
+
   build_zig:
     cmds:
       - mkdir -p ./nif/obj/zig
       - zig build-lib --library c -dynamic -fPIC  -I $ERL_HEADERS -femit-bin=nif/obj/zig/libzig_hello_world.so nif/zig/hello_world.zig
     generates:
-      - ./nif/obj/zig/hello_world.so
+      - nif/obj/zig/libzig_hello_world.so
     sources:
       - ./nif/zig/*.zig
     silent: true
+
   tests:
     deps: [main_tests]
     aliases: [t]

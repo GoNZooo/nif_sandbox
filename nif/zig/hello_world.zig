@@ -2,7 +2,7 @@ const nif_utilities = @import("nif_utilities.zig");
 const erlang = nif_utilities.erlang;
 
 var entry: erlang.ErlNifEntry = nif_utilities.makeEntry(
-    "Elixir.HelloWorldInZig",
+    "Elixir.ZigNif",
     nif_functions[0..],
     null,
     null,

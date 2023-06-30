@@ -1,8 +1,8 @@
-defmodule HelloWorldInOdin do
+defmodule CNif do
   @on_load :init
 
   def init() do
-    :erlang.load_nif("nif/obj/odin/hello_from_odin", 0)
+    :erlang.load_nif("nif/obj/c/hello_world", 0)
   end
 
   def hello() do

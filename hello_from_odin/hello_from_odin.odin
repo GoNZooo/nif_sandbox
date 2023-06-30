@@ -6,7 +6,7 @@ import "core:runtime"
 
 import "../erldin"
 
-entry := erldin.ErlNifEntry{}
+entry: erldin.ErlNifEntry
 
 hello :: proc "c" (
   env: ^erldin.ErlNifEnv,
@@ -53,7 +53,7 @@ nif_functions := [?]erldin.ErlNifFunc{
 nif_init :: proc "c" () -> ^erldin.ErlNifEntry {
   entry.major = 2
   entry.minor = 16
-  entry.name = "Elixir.HelloWorldInOdin"
+  entry.name = "Elixir.OdinNif"
   entry.funcs = raw_data(nif_functions[:])
   entry.num_of_funcs = len(nif_functions)
   entry.vm_variant = "beam.vanilla"

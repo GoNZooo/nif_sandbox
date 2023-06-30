@@ -1,4 +1,4 @@
-defmodule HelloWorldInZig do
+defmodule ZigNif do
   @on_load :init
 
   def init() do
