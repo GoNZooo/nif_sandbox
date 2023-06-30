@@ -8,4 +8,8 @@ defmodule HelloWorldInC do
   def hello() do
     :erlang.nif_error("NIF not loaded")
   end
+
+  def hello_binary(_count) do
+    :erlang.nif_error("NIF not loaded")
+  end
 end

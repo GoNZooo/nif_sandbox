@@ -5,7 +5,7 @@ OBJ_DIR=$(NIF_DIR)/obj
 ZIG_OUT_DIR=$(OBJ_DIR)/zig
 ZIG_NIF_BUILD=zig build-lib $(FLAGS) -I $(ERL_HEADERS) -femit-bin=$(ZIG_OUT_DIR)/$(NAME).so
 C_OUT_DIR=$(OBJ_DIR)/c
-C_NIF_BUILD=gcc -fPIC -shared -I $(ERL_HEADERS) -o $(C_OUT_DIR)/hello_world.so
+C_NIF_BUILD=gcc -fpic -shared -I $(ERL_HEADERS) -o $(C_OUT_DIR)/hello_world.so
 
 nif: hello_world.zig hello_world.c
 

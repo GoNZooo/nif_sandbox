@@ -25,3 +25,10 @@ nif_sandbox-*.tar
 **/zig-cache
 
 nif/obj
+
+*.bin
+.env
+.cache
+.task
+.starcraft
+
