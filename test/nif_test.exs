@@ -12,6 +12,7 @@ defmodule NifTest do
     assert OdinNif.hello() == 'Hello World from Odin!'
     assert OdinNif.hello_binary(42) == "oooooooooooooooooooooooooooooooooooooooooo"
     assert_raise ArgumentError, fn -> OdinNif.hello_binary(4.0) end
+    assert OdinNif.hello_tuple(:tag, 6) == {:tag, [:odin, :odin, :odin, :odin, :odin, :odin]}
   end
 
   test "zig nifs" do

@@ -32,7 +32,8 @@ tasks:
     generates:
       - ./nif/obj/odin/nifs.so
     sources:
-      - ./nifs/*
+      - ./nifs/*.odin
+      - ./erldin/*.odin
     silent: true
 
   build_c:

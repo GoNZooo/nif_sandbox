@@ -32,6 +32,7 @@ hello_binary :: proc "c" (
   }
 
   bytes := make([]u8, int_value)
+  defer delete(bytes)
   for &c in bytes {
     c = 'o'
   }
@@ -44,9 +45,34 @@ hello_binary :: proc "c" (
   return binary_value
 }
 
+hello_tuple :: proc "c" (
+  env: ^erldin.ErlNifEnv,
+  argc: c.int,
+  argv: [^]erldin.ERL_NIF_TERM,
+) -> erldin.ERL_NIF_TERM {
+  context = runtime.default_context()
+  term_argument := argv[0]
+  list_size := c.int(0)
+  if !erldin.enif_get_int(env, argv[1], &list_size) {
+    return erldin.enif_make_badarg(env)
+  }
+
+  terms := make([]erldin.ERL_NIF_TERM, list_size)
+  defer delete(terms)
+  for &term in terms {
+    term = erldin.enif_make_atom(env, "odin")
+  }
+
+  list := erldin.enif_make_list_from_array(env, raw_data(terms), u32(list_size))
+  tuple := erldin.enif_make_tuple(env, 2, term_argument, list)
+
+  return tuple
+}
+
 nif_functions := [?]erldin.ErlNifFunc{
   {name = "hello", arity = 0, fptr = erldin.Nif(hello), flags = 0},
   {name = "hello_binary", arity = 1, fptr = erldin.Nif(hello_binary), flags = 0},
+  {name = "hello_tuple", arity = 2, fptr = erldin.Nif(hello_tuple), flags = 0},
 }
 
 @(export)
