@@ -45,6 +45,7 @@ fn helloBinary(
 
     const allocator = heap.c_allocator;
     var data = allocator.alloc(u8, @intCast(usize, size)) catch unreachable;
+    defer allocator.free(data);
     for (data) |*c| {
         c.* = 'z';
     }
@@ -58,7 +59,35 @@ fn helloBinary(
     return erlang.enif_make_binary(env, &binary);
 }
 
+fn helloTuple(
+    env: ?*erlang.ErlNifEnv,
+    argc: c_int,
+    argv: [*c]const erlang.ERL_NIF_TERM,
+) callconv(.C) erlang.ERL_NIF_TERM {
+    _ = argc;
+
+    const term_argument = argv[0];
+
+    var list_size: c_int = 0;
+    if (erlang.enif_get_int(env, argv[1], &list_size) == 0) {
+        return erlang.enif_make_badarg(env);
+    }
+
+    const allocator = heap.c_allocator;
+    var data = allocator.alloc(erlang.ERL_NIF_TERM, @intCast(usize, list_size)) catch unreachable;
+    defer allocator.free(data);
+    for (data) |*c| {
+        c.* = erlang.enif_make_atom(env, "zig");
+    }
+
+    const list = erlang.enif_make_list_from_array(env, data.ptr, @intCast(c_uint, list_size));
+    const tuple = erlang.enif_make_tuple(env, 2, term_argument, list);
+
+    return tuple;
+}
+
 var nif_functions = [_]erlang.ErlNifFunc{
     erlang.ErlNifFunc{ .name = "hello", .arity = 0, .fptr = hello, .flags = 0 },
     erlang.ErlNifFunc{ .name = "hello_binary", .arity = 1, .fptr = helloBinary, .flags = 0 },
+    erlang.ErlNifFunc{ .name = "hello_tuple", .arity = 2, .fptr = helloTuple, .flags = 0 },
 };

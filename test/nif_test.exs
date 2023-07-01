@@ -19,5 +19,6 @@ defmodule NifTest do
     assert ZigNif.hello() == 'Hello World from Zig!'
     assert ZigNif.hello_binary(42) == "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
     assert_raise ArgumentError, fn -> ZigNif.hello_binary(4.0) end
+    assert ZigNif.hello_tuple(:tag, 6) == {:tag, [:zig, :zig, :zig, :zig, :zig, :zig]}
   end
 end
