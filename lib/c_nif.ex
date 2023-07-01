@@ -12,4 +12,8 @@ defmodule CNif do
   def hello_binary(_count) do
     :erlang.nif_error("NIF not loaded")
   end
+
+  def hello_tuple(_tag, _count) do
+    :erlang.nif_error("NIF not loaded")
+  end
 end
