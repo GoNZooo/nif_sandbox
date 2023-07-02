@@ -95,10 +95,9 @@ static ErlNifFunc nifs[] = {
 };
 
 static int load(ErlNifEnv *env, void **priv_data, ERL_NIF_TERM load_info) {
-  printf("loaded 'CNif' module\n");
   ErlNifResourceFlags tried;
   slots_resource_type =
-      enif_open_resource_type(env, NULL, "Slots", slots_dtor,
+      enif_open_resource_type(env, NULL, "CSlots", slots_dtor,
                               ERL_NIF_RT_CREATE | ERL_NIF_RT_TAKEOVER, &tried);
 
   if (slots_resource_type == NULL) {

@@ -1,6 +1,7 @@
 const std = @import("std");
 const heap = std.heap;
 const mem = std.mem;
+const debug = std.debug;
 const nif_utilities = @import("nif_utilities.zig");
 const erlang = nif_utilities.erlang;
 
@@ -10,11 +11,10 @@ const Slots = struct {
     allocator: mem.Allocator,
 
     pub fn init(allocator: mem.Allocator) !Slots {
-        const size = 1024;
-        var slots = try allocator.alloc(erlang.ERL_NIF_TERM, size);
+        var slots = try allocator.alloc(erlang.ERL_NIF_TERM, 1024);
 
         return Slots{
-            .size = size,
+            .size = 1024,
             .slots = slots,
             .allocator = allocator,
         };
@@ -50,7 +50,7 @@ fn slotsDestructor(env: ?*erlang.ErlNifEnv, obj: ?*anyopaque) callconv(.C) void 
     slots.deinit();
 }
 
-var slots_resource_type: *erlang.ErlNifResourceType = undefined;
+var slots_resource_type: ?*erlang.ErlNifResourceType = null;
 
 fn create(
     env: ?*erlang.ErlNifEnv,
@@ -72,15 +72,44 @@ fn create(
         },
     };
 
-    var resource = erlang.enif_alloc_resource(
-        slots_resource_type,
-        @sizeOf(Slots),
+    var resource = @ptrCast(
+        *Slots,
+        @alignCast(
+            @alignOf(*Slots),
+            erlang.enif_alloc_resource(
+                slots_resource_type,
+                @sizeOf(Slots),
+            ),
+        ),
     );
     defer erlang.enif_release_resource(resource);
-    resource.? = &slots;
+    resource.* = slots;
     var term = erlang.enif_make_resource(env, resource);
 
     return erlang.enif_make_tuple(env, 2, erlang.enif_make_atom(env, "ok"), term);
+}
+
+fn size(
+    env: ?*erlang.ErlNifEnv,
+    argc: c_int,
+    argv: [*c]const erlang.ERL_NIF_TERM,
+) callconv(.C) erlang.ERL_NIF_TERM {
+    _ = argc;
+    var slots: ?*Slots = null;
+    if (erlang.enif_get_resource(
+        env,
+        argv[0],
+        slots_resource_type.?,
+        @ptrCast([*c]?*anyopaque, &slots),
+    ) == 0) {
+        return erlang.enif_make_badarg(env);
+    }
+
+    if (slots == null) {
+        return erlang.enif_make_badarg(env);
+    }
+
+    return erlang.enif_make_int(env, @intCast(c_int, slots.?.size));
 }
 
 var entry: erlang.ErlNifEntry = nif_utilities.makeEntry(
@@ -107,7 +136,7 @@ fn load(
     const resource_open_result = erlang.enif_open_resource_type(
         env,
         null,
-        "slots",
+        "ZigSlots",
         slotsDestructor,
         erlang.ERL_NIF_RT_CREATE | erlang.ERL_NIF_RT_TAKEOVER,
         &tried,
@@ -116,11 +145,12 @@ fn load(
         return -1;
     }
 
-    slots_resource_type = resource_open_result.?;
+    slots_resource_type = resource_open_result;
 
     return 0;
 }
 
 var nifs = [_]erlang.ErlNifFunc{
     erlang.ErlNifFunc{ .name = "create", .arity = 0, .fptr = create, .flags = 0 },
+    erlang.ErlNifFunc{ .name = "size", .arity = 1, .fptr = size, .flags = 0 },
 };

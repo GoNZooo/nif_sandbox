@@ -25,7 +25,7 @@ defmodule NifTest do
 
   test "slots zig nifs" do
     {:ok, resource} = ZigNif.Slots.create()
-    # assert ZigNif.Slots.size(resource) == 1024
+    assert ZigNif.Slots.size(resource) == 1024
     # assert ZigNif.Slots.set(resource, 0, {:value, 42}) == :ok
     # assert ZigNif.Slots.get(resource, 0) == {:ok, {:value, 42}}
     # assert ZigNif.Slots.get(resource, 1024) == {:error, :index_out_of_bounds}
