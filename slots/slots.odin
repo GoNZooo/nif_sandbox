@@ -69,9 +69,69 @@ size :: proc "c" (
   return erldin.enif_make_int(env, i32(slots.size))
 }
 
+set :: proc "c" (
+  env: ^erldin.ErlNifEnv,
+  argc: c.int,
+  argv: [^]erldin.ERL_NIF_TERM,
+) -> erldin.ERL_NIF_TERM {
+  slots: ^Slots
+  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, transmute(^rawptr)&slots) {
+    return erldin.enif_make_badarg(env)
+  }
+
+  index: c.int
+  if !erldin.enif_get_int(env, argv[1], &index) {
+    return erldin.enif_make_badarg(env)
+  }
+
+  value := argv[2]
+
+  if index < 0 || int(index) >= slots.size {
+    return erldin.enif_make_tuple(
+      env,
+      2,
+      erldin.enif_make_atom(env, "error"),
+      erldin.enif_make_atom(env, "index_out_of_bounds"),
+    )
+  }
+
+  slots.data[index] = value
+
+  return erldin.enif_make_atom(env, "ok")
+}
+
+get :: proc "c" (
+  env: ^erldin.ErlNifEnv,
+  argc: c.int,
+  argv: [^]erldin.ERL_NIF_TERM,
+) -> erldin.ERL_NIF_TERM {
+  slots: ^Slots
+  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, transmute(^rawptr)&slots) {
+    return erldin.enif_make_badarg(env)
+  }
+
+  index: c.int
+  if !erldin.enif_get_int(env, argv[1], &index) {
+    return erldin.enif_make_badarg(env)
+  }
+
+  if index < 0 || int(index) >= slots.size {
+    return erldin.enif_make_tuple(
+      env,
+      2,
+      erldin.enif_make_atom(env, "error"),
+      erldin.enif_make_atom(env, "index_out_of_bounds"),
+    )
+  }
+
+  return slots.data[index]
+}
+
 nif_functions := [?]erldin.ErlNifFunc{
   {name = "create", arity = 0, fptr = erldin.Nif(create), flags = 0},
   {name = "size", arity = 1, fptr = erldin.Nif(size), flags = 0},
+  {name = "set", arity = 3, fptr = erldin.Nif(set), flags = 0},
+  {name = "get", arity = 2, fptr = erldin.Nif(get), flags = 0},
 }
 
 load :: proc "c" (
