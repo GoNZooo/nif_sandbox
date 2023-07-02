@@ -39,9 +39,11 @@ tasks:
   build_c:
     cmds:
       - mkdir -p ./nif/obj/c
-      - gcc -fpic -shared -I $ERL_HEADERS -o nif/obj/c/nifs.so nif/c/*.c
+      - gcc -fpic -shared -I $ERL_HEADERS -o nif/obj/c/nifs.so nif/c/nifs.c
+      - gcc -fpic -shared -I $ERL_HEADERS -o nif/obj/c/slots.so nif/c/slots.c
     generates:
       - ./nif/obj/c/nifs.so
+      - ./nif/obj/c/slots.so
     sources:
       - ./nif/c/*.c
     silent: true

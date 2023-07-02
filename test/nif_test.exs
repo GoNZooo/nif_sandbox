@@ -9,11 +9,11 @@ defmodule NifTest do
   end
 
   test "resource creation c nifs" do
-    {:ok, resource} = CNif.slots_create()
-    assert CNif.slots_size(resource) == 1024
-    assert CNif.slots_set(resource, 0, {:value, 42}) == :ok
-    assert CNif.slots_get(resource, 0) == {:ok, {:value, 42}}
-    assert CNif.slots_get(resource, 1024) == {:error, :index_out_of_bounds}
+    {:ok, resource} = CNif.Slots.create()
+    assert CNif.Slots.size(resource) == 1024
+    assert CNif.Slots.set(resource, 0, {:value, 42}) == :ok
+    assert CNif.Slots.get(resource, 0) == {:ok, {:value, 42}}
+    assert CNif.Slots.get(resource, 1024) == {:error, :index_out_of_bounds}
   end
 
   test "odin nifs" do
