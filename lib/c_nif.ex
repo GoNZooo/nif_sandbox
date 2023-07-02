@@ -16,4 +16,20 @@ defmodule CNif do
   def hello_tuple(_tag, _count) do
     :erlang.nif_error("NIF not loaded")
   end
+
+  def slots_create() do
+    :erlang.nif_error("NIF not loaded")
+  end
+
+  def slots_size(_slots) do
+    :erlang.nif_error("NIF not loaded")
+  end
+
+  def slots_set(_slots, _index, _value) do
+    :erlang.nif_error("NIF not loaded")
+  end
+
+  def slots_get(_slots, _index) do
+    :erlang.nif_error("NIF not loaded")
+  end
 end

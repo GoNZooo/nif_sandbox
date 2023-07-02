@@ -1,11 +1,19 @@
 defmodule NifTest do
   use ExUnit.Case
 
-  test "c nifs" do
+  test "basic c nifs" do
     assert CNif.hello() == 'Hello World from C!'
     assert CNif.hello_binary(42) == "cccccccccccccccccccccccccccccccccccccccccc"
     assert_raise ArgumentError, fn -> CNif.hello_binary(4.0) end
     assert CNif.hello_tuple(:tag, 6) == {:tag, [:c, :c, :c, :c, :c, :c]}
+  end
+
+  test "resource creation c nifs" do
+    {:ok, resource} = CNif.slots_create()
+    assert CNif.slots_size(resource) == 1024
+    assert CNif.slots_set(resource, 0, {:value, 42}) == :ok
+    assert CNif.slots_get(resource, 0) == {:ok, {:value, 42}}
+    assert CNif.slots_get(resource, 1024) == {:error, :index_out_of_bounds}
   end
 
   test "odin nifs" do
