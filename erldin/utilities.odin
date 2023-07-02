@@ -50,6 +50,7 @@ foreign erldin {
   enif_make_string :: proc(env: ^ErlNifEnv, string: cstring, encoding: c.uint) -> ERL_NIF_TERM ---
 
   enif_get_int :: proc(env: ^ErlNifEnv, term: ERL_NIF_TERM, ip: ^c.int) -> b32 ---
+  enif_get_resource :: proc(env: ^ErlNifEnv, term: ERL_NIF_TERM, resource_type: ^ResourceType, obj: ^rawptr) -> b32 ---
 
   // Resources
   enif_open_resource_type :: proc(env: ^ErlNifEnv, module: cstring, name: cstring, destructor: ResourceDestructor, flags: ResourceFlags, tried: ^ResourceFlags) -> ^ResourceType ---

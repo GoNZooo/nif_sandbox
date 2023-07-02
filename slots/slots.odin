@@ -54,8 +54,24 @@ create :: proc "c" (
   return erldin.enif_make_tuple(env, 2, erldin.enif_make_atom(env, "ok"), term)
 }
 
+size :: proc "c" (
+  env: ^erldin.ErlNifEnv,
+  argc: c.int,
+  argv: [^]erldin.ERL_NIF_TERM,
+) -> erldin.ERL_NIF_TERM {
+  // context = runtime.Context{}
+
+  slots: ^Slots
+  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, transmute(^rawptr)&slots) {
+    return erldin.enif_make_badarg(env)
+  }
+
+  return erldin.enif_make_int(env, i32(slots.size))
+}
+
 nif_functions := [?]erldin.ErlNifFunc{
   {name = "create", arity = 0, fptr = erldin.Nif(create), flags = 0},
+  {name = "size", arity = 1, fptr = erldin.Nif(size), flags = 0},
 }
 
 load :: proc "c" (
