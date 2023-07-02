@@ -50,6 +50,12 @@ foreign erldin {
   enif_make_string :: proc(env: ^ErlNifEnv, string: cstring, encoding: c.uint) -> ERL_NIF_TERM ---
 
   enif_get_int :: proc(env: ^ErlNifEnv, term: ERL_NIF_TERM, ip: ^c.int) -> b32 ---
+
+  // Resources
+  enif_open_resource_type :: proc(env: ^ErlNifEnv, module: cstring, name: cstring, destructor: ResourceDestructor, flags: ResourceFlags, tried: ^ResourceFlags) -> ^ResourceType ---
+  enif_alloc_resource :: proc(resource_type: ^ResourceType, size: c.size_t) -> ^rawptr ---
+  enif_make_resource :: proc(env: ^ErlNifEnv, resource: ^rawptr) -> ERL_NIF_TERM ---
+  enif_release_resource :: proc(resource: ^rawptr) ---
 }
 
 ErlNifBinary :: struct {
@@ -59,15 +65,22 @@ ErlNifBinary :: struct {
   __spare__: [2]rawptr,
 }
 
+ResourceType :: distinct rawptr
+
+ResourceFlags :: enum {
+  CREATE   = 1,
+  TAKEOVER = 2,
+}
+
 // typedef void ErlNifResourceDtor(ErlNifEnv*, void*);
 // typedef void ErlNifResourceStop(ErlNifEnv*, void*, ErlNifEvent, int is_direct_call);
 // typedef void ErlNifResourceDown(ErlNifEnv*, void*, ErlNifPid*, ErlNifMonitor*);
 // typedef void ErlNifResourceDynCall(ErlNifEnv*, void* obj, void* call_data);
 
-ErlNifResourceDtor :: proc(env: ^ErlNifEnv, resource: rawptr)
+ResourceDestructor :: proc(env: ^ErlNifEnv, resource: ^rawptr)
 
 ErlNifResourceTypeInit :: struct {
-  dtor:    ErlNifResourceDtor,
+  dtor:    ResourceDestructor,
   stop:    rawptr,
   down:    rawptr,
   members: c.int,

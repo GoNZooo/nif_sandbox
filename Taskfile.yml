@@ -28,11 +28,13 @@ tasks:
   build_odin:
     cmds:
       - mkdir -p ./nif/obj/odin
-      - odin build nifs -reloc-mode=pic -build-mode:shared -out:nif/obj/odin/nifs.so
+      - odin build slots -reloc-mode=pic -build-mode:shared -out:nif/obj/odin/slots.so
     generates:
       - ./nif/obj/odin/nifs.so
+      - ./nif/obj/odin/slots.so
     sources:
       - ./nifs/*.odin
+      - ./slots/*.odin
       - ./erldin/*.odin
     silent: true
 
@@ -71,6 +73,7 @@ tasks:
     cmds:
       - mix test
     sources:
+      - lib/**/*.ex
       - ./test/*
     silent: true
     aliases:
