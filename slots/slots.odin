@@ -124,7 +124,7 @@ get :: proc "c" (
     )
   }
 
-  return slots.data[index]
+  return erldin.enif_make_tuple(env, 2, erldin.enif_make_atom(env, "ok"), slots.data[index])
 }
 
 nif_functions := [?]erldin.ErlNifFunc{
