@@ -22,7 +22,7 @@ const Slots = struct {
 
     pub fn set(self: *Slots, index: usize, term: erlang.ERL_NIF_TERM) !void {
         if (index >= self.size) {
-            return error.InvalidArgument;
+            return error.IndexOutOfBounds;
         }
 
         self.slots[index] = term;
@@ -95,7 +95,7 @@ fn size(
     argv: [*c]const erlang.ERL_NIF_TERM,
 ) callconv(.C) erlang.ERL_NIF_TERM {
     _ = argc;
-    var slots: ?*Slots = null;
+    var slots: *Slots = undefined;
     if (erlang.enif_get_resource(
         env,
         argv[0],
@@ -105,11 +105,79 @@ fn size(
         return erlang.enif_make_badarg(env);
     }
 
-    if (slots == null) {
+    return erlang.enif_make_int(env, @intCast(c_int, slots.size));
+}
+
+fn set(
+    env: ?*erlang.ErlNifEnv,
+    argc: c_int,
+    argv: [*c]const erlang.ERL_NIF_TERM,
+) callconv(.C) erlang.ERL_NIF_TERM {
+    _ = argc;
+    var slots: *Slots = undefined;
+    if (erlang.enif_get_resource(
+        env,
+        argv[0],
+        slots_resource_type.?,
+        @ptrCast([*c]?*anyopaque, &slots),
+    ) == 0) {
         return erlang.enif_make_badarg(env);
     }
 
-    return erlang.enif_make_int(env, @intCast(c_int, slots.?.size));
+    var index: c_int = 0;
+    if (erlang.enif_get_int(env, argv[1], &index) == 0) {
+        return erlang.enif_make_badarg(env);
+    }
+
+    var term = argv[2];
+
+    slots.set(@intCast(usize, index), term) catch |e| switch (e) {
+        error.IndexOutOfBounds => {
+            return erlang.enif_make_tuple(
+                env,
+                2,
+                erlang.enif_make_atom(env, "error"),
+                erlang.enif_make_atom(env, "index_out_of_bounds"),
+            );
+        },
+    };
+
+    return erlang.enif_make_atom(env, "ok");
+}
+
+fn get(
+    env: ?*erlang.ErlNifEnv,
+    argc: c_int,
+    argv: [*c]const erlang.ERL_NIF_TERM,
+) callconv(.C) erlang.ERL_NIF_TERM {
+    _ = argc;
+    var slots: *Slots = undefined;
+    if (erlang.enif_get_resource(
+        env,
+        argv[0],
+        slots_resource_type.?,
+        @ptrCast([*c]?*anyopaque, &slots),
+    ) == 0) {
+        return erlang.enif_make_badarg(env);
+    }
+
+    var index: c_int = 0;
+    if (erlang.enif_get_int(env, argv[1], &index) == 0) {
+        return erlang.enif_make_badarg(env);
+    }
+
+    var term = slots.get(@intCast(usize, index)) catch |e| switch (e) {
+        error.IndexOutOfBounds => {
+            return erlang.enif_make_tuple(
+                env,
+                2,
+                erlang.enif_make_atom(env, "error"),
+                erlang.enif_make_atom(env, "index_out_of_bounds"),
+            );
+        },
+    };
+
+    return erlang.enif_make_tuple(env, 2, erlang.enif_make_atom(env, "ok"), term);
 }
 
 var entry: erlang.ErlNifEntry = nif_utilities.makeEntry(
@@ -153,4 +221,6 @@ fn load(
 var nifs = [_]erlang.ErlNifFunc{
     erlang.ErlNifFunc{ .name = "create", .arity = 0, .fptr = create, .flags = 0 },
     erlang.ErlNifFunc{ .name = "size", .arity = 1, .fptr = size, .flags = 0 },
+    erlang.ErlNifFunc{ .name = "set", .arity = 3, .fptr = set, .flags = 0 },
+    erlang.ErlNifFunc{ .name = "get", .arity = 2, .fptr = get, .flags = 0 },
 };
