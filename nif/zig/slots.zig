@@ -6,7 +6,6 @@ const nif_utilities = @import("nif_utilities.zig");
 const erlang = nif_utilities.erlang;
 
 const Slots = struct {
-    size: usize,
     slots: []erlang.ERL_NIF_TERM,
     allocator: mem.Allocator,
 
@@ -14,14 +13,13 @@ const Slots = struct {
         var slots = try allocator.alloc(erlang.ERL_NIF_TERM, 1024);
 
         return Slots{
-            .size = 1024,
             .slots = slots,
             .allocator = allocator,
         };
     }
 
     pub fn set(self: *Slots, index: usize, term: erlang.ERL_NIF_TERM) !void {
-        if (index >= self.size) {
+        if (index >= self.slots.len) {
             return error.IndexOutOfBounds;
         }
 
@@ -29,7 +27,7 @@ const Slots = struct {
     }
 
     pub fn get(self: *Slots, index: usize) !erlang.ERL_NIF_TERM {
-        if (index >= self.size) {
+        if (index >= self.slots.len) {
             return error.IndexOutOfBounds;
         }
 
@@ -105,7 +103,7 @@ fn size(
         return erlang.enif_make_badarg(env);
     }
 
-    return erlang.enif_make_int(env, @intCast(c_int, slots.size));
+    return erlang.enif_make_int(env, @intCast(c_int, slots.slots.len));
 }
 
 fn set(
