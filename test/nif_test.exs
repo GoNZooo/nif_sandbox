@@ -41,8 +41,8 @@ defmodule NifTest do
   test "slots odin nifs" do
     {:ok, resource} = OdinNif.Slots.create()
     assert OdinNif.Slots.size(resource) == 1024
-    # assert OdinNif.Slots.set(resource, 0, {:value, 42}) == :ok
-    # assert OdinNif.Slots.get(resource, 0) == {:ok, {:value, 42}}
-    # assert OdinNif.Slots.get(resource, 1024) == {:error, :index_out_of_bounds}
+    assert OdinNif.Slots.set(resource, 0, {:value, 42}) == :ok
+    assert OdinNif.Slots.get(resource, 0) == {:ok, {:value, 42}}
+    assert OdinNif.Slots.get(resource, 1024) == {:error, :index_out_of_bounds}
   end
 end
