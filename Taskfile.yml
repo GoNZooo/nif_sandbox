@@ -52,8 +52,10 @@ tasks:
     cmds:
       - mkdir -p ./nif/obj/zig
       - zig build-lib --library c -dynamic -fPIC  -I $ERL_HEADERS -femit-bin=nif/obj/zig/nifs.so nif/zig/nifs.zig
+      - zig build-lib --library c -dynamic -fPIC  -I $ERL_HEADERS -femit-bin=nif/obj/zig/slots.so nif/zig/slots.zig
     generates:
       - nif/obj/zig/nifs.so
+      - nif/obj/zig/slots.so
     sources:
       - ./nif/zig/*.zig
     silent: true
