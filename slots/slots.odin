@@ -12,7 +12,6 @@ entry: erldin.ErlNifEntry
 
 Slots :: struct {
   data:      []erldin.ERL_NIF_TERM,
-  size:      int,
   allocator: mem.Allocator,
 }
 
@@ -35,11 +34,10 @@ create :: proc "c" (
   context.allocator = runtime.default_allocator()
 
   slots := Slots {
-    size      = 1024,
     allocator = context.allocator,
   }
 
-  data, allocation_error := make([]erldin.ERL_NIF_TERM, slots.size, slots.allocator)
+  data, allocation_error := make([]erldin.ERL_NIF_TERM, 1024, slots.allocator)
   if allocation_error != nil {
     return erldin.enif_make_badarg(env)
   }
@@ -59,14 +57,12 @@ size :: proc "c" (
   argc: c.int,
   argv: [^]erldin.ERL_NIF_TERM,
 ) -> erldin.ERL_NIF_TERM {
-  // context = runtime.Context{}
-
   slots: ^Slots
   if !erldin.enif_get_resource(env, argv[0], slots_resource_type, transmute(^rawptr)&slots) {
     return erldin.enif_make_badarg(env)
   }
 
-  return erldin.enif_make_int(env, i32(slots.size))
+  return erldin.enif_make_int(env, i32(len(slots.data)))
 }
 
 set :: proc "c" (
@@ -86,7 +82,7 @@ set :: proc "c" (
 
   value := argv[2]
 
-  if index < 0 || int(index) >= slots.size {
+  if index < 0 || int(index) >= len(slots.data) {
     return erldin.enif_make_tuple(
       env,
       2,
@@ -115,7 +111,7 @@ get :: proc "c" (
     return erldin.enif_make_badarg(env)
   }
 
-  if index < 0 || int(index) >= slots.size {
+  if index < 0 || int(index) >= len(slots.data) {
     return erldin.enif_make_tuple(
       env,
       2,
