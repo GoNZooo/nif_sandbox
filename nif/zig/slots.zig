@@ -69,6 +69,9 @@ fn create(
             );
         },
     };
+    for (slots.slots) |*slot| {
+        slot.* = erlang.enif_make_atom(env, "unset");
+    }
 
     var resource = @ptrCast(
         *Slots,
