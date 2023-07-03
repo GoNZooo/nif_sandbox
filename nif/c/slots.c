@@ -25,6 +25,9 @@ static ERL_NIF_TERM slots_create(ErlNifEnv *env, int argc,
   if (data == NULL) {
     return return_alloc_error(env);
   }
+  for (int i = 0; i < 1024; i++) {
+    data[i] = enif_make_atom(env, "unset");
+  }
 
   Slots *slots = enif_alloc_resource(slots_resource_type, sizeof(Slots));
   slots->size = 1024;
