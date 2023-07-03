@@ -41,6 +41,10 @@ create :: proc "c" (
   if allocation_error != nil {
     return erldin.enif_make_badarg(env)
   }
+
+  for &s in data {
+    s = erldin.enif_make_atom(env, "unset")
+  }
   slots.data = data
 
   resource := erldin.enif_alloc_resource(slots_resource_type, size_of(slots))
