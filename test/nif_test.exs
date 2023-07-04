@@ -10,11 +10,11 @@ defmodule NifTest do
 
   test "slots c nifs" do
     {:ok, resource} = CNif.Slots.create()
-    assert CNif.Slots.size(resource) == 1024
+    assert CNif.Slots.size(resource) == 1
     assert CNif.Slots.get(resource, 0) == {:ok, :unset}
     assert CNif.Slots.set(resource, 0, {:value, 42}) == :ok
     assert CNif.Slots.get(resource, 0) == {:ok, {:value, 42}}
-    assert CNif.Slots.get(resource, 1024) == {:error, :index_out_of_bounds}
+    assert CNif.Slots.get(resource, 1) == {:error, :index_out_of_bounds}
   end
 
   test "zig nifs" do

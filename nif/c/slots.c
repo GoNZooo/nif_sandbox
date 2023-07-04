@@ -21,16 +21,14 @@ static ERL_NIF_TERM return_alloc_error(ErlNifEnv *env) {
 
 static ERL_NIF_TERM slots_create(ErlNifEnv *env, int argc,
                                  const ERL_NIF_TERM argv[]) {
-  ERL_NIF_TERM *data = malloc(1024 * sizeof(ERL_NIF_TERM));
+  ERL_NIF_TERM *data = malloc(1 * sizeof(ERL_NIF_TERM));
   if (data == NULL) {
     return return_alloc_error(env);
   }
-  for (int i = 0; i < 1024; i++) {
-    data[i] = enif_make_atom(env, "unset");
-  }
+  data[0] = enif_make_atom(env, "unset");
 
   Slots *slots = enif_alloc_resource(slots_resource_type, sizeof(Slots));
-  slots->size = 1024;
+  slots->size = 1;
   slots->data = data;
 
   ERL_NIF_TERM slots_term = enif_make_resource(env, slots);
