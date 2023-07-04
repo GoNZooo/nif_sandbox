@@ -3,15 +3,13 @@ package slots
 import "core:c"
 import "core:mem"
 import "core:runtime"
-// import "core:fmt"
-// import "core:runtime"
 
 import "../erldin"
 
 entry: erldin.ErlNifEntry
 
 Slots :: struct {
-  data:      []erldin.ERL_NIF_TERM,
+  data:      [dynamic]erldin.ERL_NIF_TERM,
   allocator: mem.Allocator,
 }
 
@@ -22,7 +20,7 @@ slots_destructor :: proc "c" (env: ^erldin.ErlNifEnv, obj: ^rawptr) {
 
   slots_pointer := transmute(^Slots)obj
   slots := slots_pointer^
-  delete(slots.data, slots.allocator)
+  delete(slots.data)
 }
 
 create :: proc "c" (
@@ -37,7 +35,7 @@ create :: proc "c" (
     allocator = context.allocator,
   }
 
-  data, allocation_error := make([]erldin.ERL_NIF_TERM, 1024, slots.allocator)
+  data, allocation_error := make([dynamic]erldin.ERL_NIF_TERM, 1, 1, slots.allocator)
   if allocation_error != nil {
     return erldin.enif_make_badarg(env)
   }
@@ -67,6 +65,19 @@ size :: proc "c" (
   }
 
   return erldin.enif_make_int(env, i32(len(slots.data)))
+}
+
+capacity :: proc "c" (
+  env: ^erldin.ErlNifEnv,
+  argc: c.int,
+  argv: [^]erldin.ERL_NIF_TERM,
+) -> erldin.ERL_NIF_TERM {
+  slots: ^Slots
+  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, transmute(^rawptr)&slots) {
+    return erldin.enif_make_badarg(env)
+  }
+
+  return erldin.enif_make_int(env, i32(cap(slots.data)))
 }
 
 set :: proc "c" (
@@ -127,11 +138,45 @@ get :: proc "c" (
   return erldin.enif_make_tuple(env, 2, erldin.enif_make_atom(env, "ok"), slots.data[index])
 }
 
+append_slot :: proc "c" (
+  env: ^erldin.ErlNifEnv,
+  argc: c.int,
+  argv: [^]erldin.ERL_NIF_TERM,
+) -> erldin.ERL_NIF_TERM {
+  slots: ^Slots
+  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, transmute(^rawptr)&slots) {
+    return erldin.enif_make_badarg(env)
+  }
+
+  context = runtime.Context{}
+  context.allocator = slots.allocator
+
+  value := argv[1]
+
+  if (len(slots.data) == cap(slots.data)) {
+    allocator_error := reserve(&slots.data, len(slots.data) * 2)
+    if allocator_error != nil {
+      return erldin.enif_make_tuple(
+        env,
+        2,
+        erldin.enif_make_atom(env, "error"),
+        erldin.enif_make_atom(env, "alloc_error"),
+      )
+    }
+  }
+  append(&slots.data, value)
+
+  return erldin.enif_make_atom(env, "ok")
+}
+
+
 nif_functions := [?]erldin.ErlNifFunc{
   {name = "create", arity = 0, fptr = erldin.Nif(create), flags = 0},
   {name = "size", arity = 1, fptr = erldin.Nif(size), flags = 0},
+  {name = "capacity", arity = 1, fptr = erldin.Nif(capacity), flags = 0},
   {name = "set", arity = 3, fptr = erldin.Nif(set), flags = 0},
   {name = "get", arity = 2, fptr = erldin.Nif(get), flags = 0},
+  {name = "append", arity = 2, fptr = erldin.Nif(append_slot), flags = 0},
 }
 
 load :: proc "c" (
