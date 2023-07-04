@@ -15,6 +15,18 @@ defmodule NifTest do
     assert CNif.Slots.set(resource, 0, {:value, 42}) == :ok
     assert CNif.Slots.get(resource, 0) == {:ok, {:value, 42}}
     assert CNif.Slots.get(resource, 1) == {:error, :index_out_of_bounds}
+    assert CNif.Slots.append(resource, 1337) == :ok
+    assert CNif.Slots.size(resource) == 2
+    assert CNif.Slots.capacity(resource) == 2
+    assert CNif.Slots.append(resource, 69) == :ok
+    assert CNif.Slots.size(resource) == 3
+    assert CNif.Slots.capacity(resource) == 4
+    assert CNif.Slots.append(resource, 59) == :ok
+    assert CNif.Slots.size(resource) == 4
+    assert CNif.Slots.capacity(resource) == 4
+    assert CNif.Slots.get(resource, 0) == {:ok, {:value, 42}}
+    assert CNif.Slots.get(resource, 1) == {:ok, 1337}
+    assert CNif.Slots.get(resource, 2) == {:ok, 69}
   end
 
   test "zig nifs" do
