@@ -80,6 +80,36 @@ capacity :: proc "c" (
   return erldin.enif_make_int(env, i32(cap(slots.data)))
 }
 
+reserve_space :: proc "c" (
+  env: ^erldin.ErlNifEnv,
+  argc: c.int,
+  argv: [^]erldin.ERL_NIF_TERM,
+) -> erldin.ERL_NIF_TERM {
+  slots: ^Slots
+  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, transmute(^rawptr)&slots) {
+    return erldin.enif_make_badarg(env)
+  }
+
+  context = runtime.Context{}
+  context.allocator = slots.allocator
+
+  capacity: c.int
+  if !erldin.enif_get_int(env, argv[1], &capacity) {
+    return erldin.enif_make_badarg(env)
+  }
+
+  if (int(capacity) <= cap(slots.data)) {
+    return erldin.enif_make_atom(env, "ok")
+  }
+
+  allocation_error := reserve(&slots.data, int(capacity))
+  if allocation_error != nil {
+    return alloc_error(env)
+  }
+
+  return erldin.enif_make_atom(env, "ok")
+}
+
 set :: proc "c" (
   env: ^erldin.ErlNifEnv,
   argc: c.int,
@@ -156,12 +186,7 @@ append_slot :: proc "c" (
   if (len(slots.data) == cap(slots.data)) {
     allocator_error := reserve(&slots.data, len(slots.data) * 2)
     if allocator_error != nil {
-      return erldin.enif_make_tuple(
-        env,
-        2,
-        erldin.enif_make_atom(env, "error"),
-        erldin.enif_make_atom(env, "alloc_error"),
-      )
+      return alloc_error(env)
     }
   }
   append(&slots.data, value)
@@ -169,11 +194,20 @@ append_slot :: proc "c" (
   return erldin.enif_make_atom(env, "ok")
 }
 
+alloc_error :: proc(env: ^erldin.ErlNifEnv) -> erldin.ERL_NIF_TERM {
+  return erldin.enif_make_tuple(
+    env,
+    2,
+    erldin.enif_make_atom(env, "error"),
+    erldin.enif_make_atom(env, "alloc_error"),
+  )
+}
 
 nif_functions := [?]erldin.ErlNifFunc{
   {name = "create", arity = 0, fptr = erldin.Nif(create), flags = 0},
   {name = "size", arity = 1, fptr = erldin.Nif(size), flags = 0},
   {name = "capacity", arity = 1, fptr = erldin.Nif(capacity), flags = 0},
+  {name = "reserve", arity = 2, fptr = erldin.Nif(reserve_space), flags = 0},
   {name = "set", arity = 3, fptr = erldin.Nif(set), flags = 0},
   {name = "get", arity = 2, fptr = erldin.Nif(get), flags = 0},
   {name = "append", arity = 2, fptr = erldin.Nif(append_slot), flags = 0},

@@ -2,7 +2,7 @@ defmodule CNif.Slots do
   @on_load :init
 
   def init() do
-    :erlang.load_nif("nif/obj/c/slots", 0)
+    :erlang.load_nif('nif/obj/c/slots', 0)
   end
 
   def create() do
@@ -14,6 +14,10 @@ defmodule CNif.Slots do
   end
 
   def capacity(_slots) do
+    :erlang.nif_error("NIF not loaded")
+  end
+
+  def reserve(_slots, _capacity) do
     :erlang.nif_error("NIF not loaded")
   end
 

@@ -59,6 +59,33 @@ static ERL_NIF_TERM slots_capacity(ErlNifEnv *env, int argc,
   return enif_make_int(env, slots->capacity);
 }
 
+static ERL_NIF_TERM slots_reserve(ErlNifEnv *env, int argc,
+                                  const ERL_NIF_TERM argv[]) {
+  Slots *slots;
+  if (!enif_get_resource(env, argv[0], slots_resource_type, (void **)&slots)) {
+    return enif_make_badarg(env);
+  }
+
+  int capacity = 0;
+  if (!enif_get_int(env, argv[1], &capacity)) {
+    return enif_make_badarg(env);
+  }
+
+  if (capacity <= slots->capacity) {
+    return enif_make_atom(env, "ok");
+  }
+
+  ERL_NIF_TERM *new_data =
+      realloc(slots->data, capacity * sizeof(ERL_NIF_TERM));
+  if (new_data == NULL) {
+    return return_alloc_error(env);
+  }
+  slots->data = new_data;
+  slots->capacity = capacity;
+
+  return enif_make_atom(env, "ok");
+}
+
 static ERL_NIF_TERM slots_set(ErlNifEnv *env, int argc,
                               const ERL_NIF_TERM argv[]) {
   Slots *slots;
@@ -127,8 +154,9 @@ static ERL_NIF_TERM slots_append(ErlNifEnv *env, int argc,
 
 static ErlNifFunc nifs[] = {
     {"create", 0, slots_create},     {"size", 1, slots_size},
-    {"capacity", 1, slots_capacity}, {"set", 3, slots_set},
-    {"get", 2, slots_get},           {"append", 2, slots_append},
+    {"capacity", 1, slots_capacity}, {"reserve", 2, slots_reserve},
+    {"set", 3, slots_set},           {"get", 2, slots_get},
+    {"append", 2, slots_append},
 };
 
 static int load(ErlNifEnv *env, void **priv_data, ERL_NIF_TERM load_info) {

@@ -130,6 +130,48 @@ fn capacity(
     return erlang.enif_make_int(env, @intCast(c_int, slots.slots.len));
 }
 
+fn reserve(
+    env: ?*erlang.ErlNifEnv,
+    argc: c_int,
+    argv: [*c]const erlang.ERL_NIF_TERM,
+) callconv(.C) erlang.ERL_NIF_TERM {
+    _ = argc;
+    var slots: *Slots = undefined;
+    if (erlang.enif_get_resource(
+        env,
+        argv[0],
+        slots_resource_type.?,
+        @ptrCast([*c]?*anyopaque, &slots),
+    ) == 0) {
+        return erlang.enif_make_badarg(env);
+    }
+
+    var requested_capacity: c_int = 0;
+    if (erlang.enif_get_int(env, argv[1], &requested_capacity) == 0) {
+        return erlang.enif_make_badarg(env);
+    }
+
+    if (requested_capacity <= slots.slots.len) {
+        return erlang.enif_make_atom(env, "ok");
+    }
+
+    var new_slots = slots.allocator.realloc(
+        slots.slots,
+        @intCast(usize, requested_capacity),
+    ) catch |e| switch (e) {
+        error.OutOfMemory => {
+            return erlang.enif_make_tuple(
+                env,
+                2,
+                erlang.enif_make_atom(env, "error"),
+                erlang.enif_make_atom(env, "alloc_error"),
+            );
+        },
+    };
+    slots.slots = new_slots;
+
+    return erlang.enif_make_atom(env, "ok");
+}
 fn set(
     env: ?*erlang.ErlNifEnv,
     argc: c_int,
@@ -280,6 +322,7 @@ var nifs = [_]erlang.ErlNifFunc{
     erlang.ErlNifFunc{ .name = "create", .arity = 0, .fptr = create, .flags = 0 },
     erlang.ErlNifFunc{ .name = "size", .arity = 1, .fptr = size, .flags = 0 },
     erlang.ErlNifFunc{ .name = "capacity", .arity = 1, .fptr = capacity, .flags = 0 },
+    erlang.ErlNifFunc{ .name = "reserve", .arity = 2, .fptr = reserve, .flags = 0 },
     erlang.ErlNifFunc{ .name = "set", .arity = 3, .fptr = set, .flags = 0 },
     erlang.ErlNifFunc{ .name = "get", .arity = 2, .fptr = get, .flags = 0 },
     erlang.ErlNifFunc{ .name = "append", .arity = 2, .fptr = append, .flags = 0 },

@@ -28,6 +28,9 @@ defmodule NifTest do
       assert unquote(module).get(resource, 0) == {:ok, {:value, 42}}
       assert unquote(module).get(resource, 1) == {:ok, 1337}
       assert unquote(module).get(resource, 2) == {:ok, 69}
+      assert unquote(module).reserve(resource, 8) == :ok
+      assert unquote(module).size(resource) == 4
+      assert unquote(module).capacity(resource) == 8
     end
   end
 
