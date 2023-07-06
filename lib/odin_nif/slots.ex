@@ -32,4 +32,8 @@ defmodule OdinNif.Slots do
   def append(_slots, _value) do
     :erlang.nif_error("NIF not loaded")
   end
+
+  def to_list(_slots) do
+    :erlang.nif_error("NIF not loaded")
+  end
 end

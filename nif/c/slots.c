@@ -152,11 +152,21 @@ static ERL_NIF_TERM slots_append(ErlNifEnv *env, int argc,
   return enif_make_atom(env, "ok");
 }
 
+static ERL_NIF_TERM slots_to_list(ErlNifEnv *env, int argc,
+                                  const ERL_NIF_TERM argv[]) {
+  Slots *slots;
+  if (!enif_get_resource(env, argv[0], slots_resource_type, (void **)&slots)) {
+    return enif_make_badarg(env);
+  }
+
+  return enif_make_list_from_array(env, slots->data, slots->size);
+}
+
 static ErlNifFunc nifs[] = {
     {"create", 0, slots_create},     {"size", 1, slots_size},
     {"capacity", 1, slots_capacity}, {"reserve", 2, slots_reserve},
     {"set", 3, slots_set},           {"get", 2, slots_get},
-    {"append", 2, slots_append},
+    {"append", 2, slots_append},     {"to_list", 1, slots_to_list},
 };
 
 static int load(ErlNifEnv *env, void **priv_data, ERL_NIF_TERM load_info) {

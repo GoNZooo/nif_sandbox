@@ -31,6 +31,7 @@ defmodule NifTest do
       assert unquote(module).reserve(resource, 8) == :ok
       assert unquote(module).size(resource) == 4
       assert unquote(module).capacity(resource) == 8
+      assert unquote(module).to_list(resource) == [{:value, 42}, 1337, 69, 59]
     end
   end
 

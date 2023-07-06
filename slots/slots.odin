@@ -194,6 +194,22 @@ append_slot :: proc "c" (
   return erldin.enif_make_atom(env, "ok")
 }
 
+to_list :: proc "c" (
+  env: ^erldin.ErlNifEnv,
+  argc: c.int,
+  argv: [^]erldin.ERL_NIF_TERM,
+) -> erldin.ERL_NIF_TERM {
+  slots: ^Slots
+  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, transmute(^rawptr)&slots) {
+    return erldin.enif_make_badarg(env)
+  }
+
+  context = runtime.Context{}
+  context.allocator = slots.allocator
+
+  return erldin.enif_make_list_from_array(env, raw_data(slots.data), u32(len(slots.data)))
+}
+
 alloc_error :: proc(env: ^erldin.ErlNifEnv) -> erldin.ERL_NIF_TERM {
   return erldin.enif_make_tuple(
     env,
@@ -211,6 +227,7 @@ nif_functions := [?]erldin.ErlNifFunc{
   {name = "set", arity = 3, fptr = erldin.Nif(set), flags = 0},
   {name = "get", arity = 2, fptr = erldin.Nif(get), flags = 0},
   {name = "append", arity = 2, fptr = erldin.Nif(append_slot), flags = 0},
+  {name = "to_list", arity = 1, fptr = erldin.Nif(to_list), flags = 0},
 }
 
 load :: proc "c" (

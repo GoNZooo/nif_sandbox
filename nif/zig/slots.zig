@@ -280,6 +280,25 @@ fn append(
     return erlang.enif_make_atom(env, "ok");
 }
 
+fn toList(
+    env: ?*erlang.ErlNifEnv,
+    argc: c_int,
+    argv: [*c]const erlang.ERL_NIF_TERM,
+) callconv(.C) erlang.ERL_NIF_TERM {
+    _ = argc;
+    var slots: *Slots = undefined;
+    if (erlang.enif_get_resource(
+        env,
+        argv[0],
+        slots_resource_type.?,
+        @ptrCast([*c]?*anyopaque, &slots),
+    ) == 0) {
+        return erlang.enif_make_badarg(env);
+    }
+
+    return erlang.enif_make_list_from_array(env, slots.slots.ptr, @intCast(c_uint, slots.size));
+}
+
 var entry: erlang.ErlNifEntry = nif_utilities.makeEntry(
     "Elixir.ZigNif.Slots",
     nifs[0..],
@@ -326,4 +345,5 @@ var nifs = [_]erlang.ErlNifFunc{
     erlang.ErlNifFunc{ .name = "set", .arity = 3, .fptr = set, .flags = 0 },
     erlang.ErlNifFunc{ .name = "get", .arity = 2, .fptr = get, .flags = 0 },
     erlang.ErlNifFunc{ .name = "append", .arity = 2, .fptr = append, .flags = 0 },
+    erlang.ErlNifFunc{ .name = "to_list", .arity = 1, .fptr = toList, .flags = 0 },
 };
