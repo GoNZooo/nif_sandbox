@@ -18,7 +18,7 @@ slots_resource_type: ^erldin.ResourceType
 slots_destructor :: proc "c" (env: ^erldin.ErlNifEnv, obj: ^rawptr) {
   context = runtime.Context{}
 
-  slots_pointer := transmute(^Slots)obj
+  slots_pointer := cast(^Slots)obj
   slots := slots_pointer^
   delete(slots.data)
 }
@@ -47,7 +47,7 @@ create :: proc "c" (
 
   resource := erldin.enif_alloc_resource(slots_resource_type, size_of(slots))
   defer erldin.enif_release_resource(resource)
-  resource_pointer := transmute(^Slots)resource
+  resource_pointer := cast(^Slots)resource
   resource_pointer^ = slots
   term := erldin.enif_make_resource(env, resource)
 
@@ -60,7 +60,7 @@ size :: proc "c" (
   argv: [^]erldin.ERL_NIF_TERM,
 ) -> erldin.ERL_NIF_TERM {
   slots: ^Slots
-  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, transmute(^rawptr)&slots) {
+  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, cast(^rawptr)&slots) {
     return erldin.enif_make_badarg(env)
   }
 
@@ -73,7 +73,7 @@ capacity :: proc "c" (
   argv: [^]erldin.ERL_NIF_TERM,
 ) -> erldin.ERL_NIF_TERM {
   slots: ^Slots
-  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, transmute(^rawptr)&slots) {
+  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, cast(^rawptr)&slots) {
     return erldin.enif_make_badarg(env)
   }
 
@@ -86,7 +86,7 @@ reserve_space :: proc "c" (
   argv: [^]erldin.ERL_NIF_TERM,
 ) -> erldin.ERL_NIF_TERM {
   slots: ^Slots
-  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, transmute(^rawptr)&slots) {
+  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, cast(^rawptr)&slots) {
     return erldin.enif_make_badarg(env)
   }
 
@@ -116,7 +116,7 @@ set :: proc "c" (
   argv: [^]erldin.ERL_NIF_TERM,
 ) -> erldin.ERL_NIF_TERM {
   slots: ^Slots
-  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, transmute(^rawptr)&slots) {
+  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, cast(^rawptr)&slots) {
     return erldin.enif_make_badarg(env)
   }
 
@@ -147,7 +147,7 @@ get :: proc "c" (
   argv: [^]erldin.ERL_NIF_TERM,
 ) -> erldin.ERL_NIF_TERM {
   slots: ^Slots
-  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, transmute(^rawptr)&slots) {
+  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, cast(^rawptr)&slots) {
     return erldin.enif_make_badarg(env)
   }
 
@@ -174,7 +174,7 @@ append_slot :: proc "c" (
   argv: [^]erldin.ERL_NIF_TERM,
 ) -> erldin.ERL_NIF_TERM {
   slots: ^Slots
-  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, transmute(^rawptr)&slots) {
+  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, cast(^rawptr)&slots) {
     return erldin.enif_make_badarg(env)
   }
 
@@ -200,7 +200,7 @@ to_list :: proc "c" (
   argv: [^]erldin.ERL_NIF_TERM,
 ) -> erldin.ERL_NIF_TERM {
   slots: ^Slots
-  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, transmute(^rawptr)&slots) {
+  if !erldin.enif_get_resource(env, argv[0], slots_resource_type, cast(^rawptr)&slots) {
     return erldin.enif_make_badarg(env)
   }
 

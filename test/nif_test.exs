@@ -14,6 +14,7 @@ defmodule NifTest do
       assert unquote(module).size(resource) == 1
       assert unquote(module).get(resource, 0) == {:ok, :unset}
       assert unquote(module).set(resource, 0, {:value, 42}) == :ok
+      assert unquote(module).set(resource, 1, {:value, 42}) == {:error, :index_out_of_bounds}
       assert unquote(module).get(resource, 0) == {:ok, {:value, 42}}
       assert unquote(module).get(resource, 1) == {:error, :index_out_of_bounds}
       assert unquote(module).append(resource, 1337) == :ok

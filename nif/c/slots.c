@@ -99,7 +99,8 @@ static ERL_NIF_TERM slots_set(ErlNifEnv *env, int argc,
   }
 
   if (index >= slots->size) {
-    return enif_make_badarg(env);
+    return enif_make_tuple(env, 2, enif_make_atom(env, "error"),
+                           enif_make_atom(env, "index_out_of_bounds"));
   }
 
   slots->data[index] = argv[2];
