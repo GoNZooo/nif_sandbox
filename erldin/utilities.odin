@@ -38,7 +38,7 @@ NoEnvironmentVariableSet :: struct {
 
 foreign import erldin "erldin_nif.h"
 foreign erldin {
-  enif_make_binary :: proc(env: ^Env, bin: ^ErlNifBinary) -> Term ---
+  enif_make_binary :: proc(env: ^Env, bin: ^Binary) -> Term ---
   enif_make_badarg :: proc(env: ^Env) -> Term ---
   enif_make_int :: proc(env: ^Env, i: c.int) -> Term ---
   enif_make_ulong :: proc(env: ^Env, i: c.ulong) -> Term ---
@@ -59,7 +59,7 @@ foreign erldin {
   enif_release_resource :: proc(resource: ^rawptr) ---
 }
 
-ErlNifBinary :: struct {
+Binary :: struct {
   size:      c.size_t,
   data:      [^]u8,
   ref_bin:   rawptr,
@@ -80,7 +80,7 @@ ResourceFlags :: enum {
 
 ResourceDestructor :: proc(env: ^Env, resource: ^rawptr)
 
-ErlNifResourceTypeInit :: struct {
+ResourceTypeInit :: struct {
   dtor:    ResourceDestructor,
   stop:    rawptr,
   down:    rawptr,
@@ -88,12 +88,12 @@ ErlNifResourceTypeInit :: struct {
   dyncall: rawptr,
 }
 
-ErlNifEntry :: struct {
+NifEntry :: struct {
   major:                         c.int,
   minor:                         c.int,
   name:                          cstring,
   num_of_funcs:                  c.int,
-  funcs:                         [^]ErlNifFunc,
+  funcs:                         [^]NifFunc,
   load:                          LoadFunction,
   reload:                        ReloadFunction,
   upgrade:                       UpgradeFunction,
@@ -121,7 +121,7 @@ UpgradeFunction :: proc(
 
 UnloadFunction :: proc(env: ^Env, priv_data: rawptr)
 
-ErlNifFunc :: struct {
+NifFunc :: struct {
   name:  cstring,
   arity: c.uint,
   fptr:  Nif,

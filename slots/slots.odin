@@ -6,7 +6,7 @@ import "core:runtime"
 
 import "../erldin"
 
-entry: erldin.ErlNifEntry
+entry: erldin.NifEntry
 
 Slots :: struct {
   data:      [dynamic]erldin.Term,
@@ -187,7 +187,7 @@ alloc_error :: proc(env: ^erldin.Env) -> erldin.Term {
   )
 }
 
-nif_functions := [?]erldin.ErlNifFunc{
+nif_functions := [?]erldin.NifFunc{
   {name = "create", arity = 0, fptr = erldin.Nif(create), flags = 0},
   {name = "size", arity = 1, fptr = erldin.Nif(size), flags = 0},
   {name = "capacity", arity = 1, fptr = erldin.Nif(capacity), flags = 0},
@@ -213,7 +213,7 @@ load :: proc "c" (env: ^erldin.Env, priv_data: [^]rawptr, load_info: erldin.Term
 }
 
 @(export)
-nif_init :: proc "c" () -> ^erldin.ErlNifEntry {
+nif_init :: proc "c" () -> ^erldin.NifEntry {
   entry.major = 2
   entry.minor = 16
   entry.name = "Elixir.OdinNif.Slots"
@@ -221,7 +221,7 @@ nif_init :: proc "c" () -> ^erldin.ErlNifEntry {
   entry.num_of_funcs = len(nif_functions)
   entry.vm_variant = "beam.vanilla"
   entry.options = 1
-  entry.sizeof_ErlNifResourceTypeInit = size_of(erldin.ErlNifResourceTypeInit)
+  entry.sizeof_ErlNifResourceTypeInit = size_of(erldin.ResourceTypeInit)
   entry.min_erts = "erts-12.0"
   entry.load = erldin.LoadFunction(load)
 
