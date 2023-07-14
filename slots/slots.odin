@@ -15,7 +15,7 @@ Slots :: struct {
 
 slots_resource_type: ^erldin.ResourceType
 
-slots_destructor :: proc "c" (env: ^erldin.ErlNifEnv, obj: ^rawptr) {
+slots_destructor :: proc "c" (env: ^erldin.Env, obj: ^rawptr) {
   context = runtime.Context{}
 
   slots_pointer := cast(^Slots)obj
@@ -24,7 +24,7 @@ slots_destructor :: proc "c" (env: ^erldin.ErlNifEnv, obj: ^rawptr) {
 }
 
 create :: proc "c" (
-  env: ^erldin.ErlNifEnv,
+  env: ^erldin.Env,
   argc: c.int,
   argv: [^]erldin.ERL_NIF_TERM,
 ) -> erldin.ERL_NIF_TERM {
@@ -55,7 +55,7 @@ create :: proc "c" (
 }
 
 size :: proc "c" (
-  env: ^erldin.ErlNifEnv,
+  env: ^erldin.Env,
   argc: c.int,
   argv: [^]erldin.ERL_NIF_TERM,
 ) -> erldin.ERL_NIF_TERM {
@@ -68,7 +68,7 @@ size :: proc "c" (
 }
 
 capacity :: proc "c" (
-  env: ^erldin.ErlNifEnv,
+  env: ^erldin.Env,
   argc: c.int,
   argv: [^]erldin.ERL_NIF_TERM,
 ) -> erldin.ERL_NIF_TERM {
@@ -81,7 +81,7 @@ capacity :: proc "c" (
 }
 
 reserve_space :: proc "c" (
-  env: ^erldin.ErlNifEnv,
+  env: ^erldin.Env,
   argc: c.int,
   argv: [^]erldin.ERL_NIF_TERM,
 ) -> erldin.ERL_NIF_TERM {
@@ -111,7 +111,7 @@ reserve_space :: proc "c" (
 }
 
 set :: proc "c" (
-  env: ^erldin.ErlNifEnv,
+  env: ^erldin.Env,
   argc: c.int,
   argv: [^]erldin.ERL_NIF_TERM,
 ) -> erldin.ERL_NIF_TERM {
@@ -142,7 +142,7 @@ set :: proc "c" (
 }
 
 get :: proc "c" (
-  env: ^erldin.ErlNifEnv,
+  env: ^erldin.Env,
   argc: c.int,
   argv: [^]erldin.ERL_NIF_TERM,
 ) -> erldin.ERL_NIF_TERM {
@@ -169,7 +169,7 @@ get :: proc "c" (
 }
 
 append_slot :: proc "c" (
-  env: ^erldin.ErlNifEnv,
+  env: ^erldin.Env,
   argc: c.int,
   argv: [^]erldin.ERL_NIF_TERM,
 ) -> erldin.ERL_NIF_TERM {
@@ -195,7 +195,7 @@ append_slot :: proc "c" (
 }
 
 to_list :: proc "c" (
-  env: ^erldin.ErlNifEnv,
+  env: ^erldin.Env,
   argc: c.int,
   argv: [^]erldin.ERL_NIF_TERM,
 ) -> erldin.ERL_NIF_TERM {
@@ -210,7 +210,7 @@ to_list :: proc "c" (
   return erldin.enif_make_list_from_array(env, raw_data(slots.data), u32(len(slots.data)))
 }
 
-alloc_error :: proc(env: ^erldin.ErlNifEnv) -> erldin.ERL_NIF_TERM {
+alloc_error :: proc(env: ^erldin.Env) -> erldin.ERL_NIF_TERM {
   return erldin.enif_make_tuple(
     env,
     2,
@@ -231,7 +231,7 @@ nif_functions := [?]erldin.ErlNifFunc{
 }
 
 load :: proc "c" (
-  env: ^erldin.ErlNifEnv,
+  env: ^erldin.Env,
   priv_data: [^]rawptr,
   load_info: erldin.ERL_NIF_TERM,
 ) -> c.int {
