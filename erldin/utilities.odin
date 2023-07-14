@@ -37,26 +37,27 @@ NoEnvironmentVariableSet :: struct {
 // #  define enif_get_list_cell ERL_NIF_API_FUNC_MACRO(enif_get_list_cell)
 
 foreign import erldin "erldin_nif.h"
+@(link_prefix = "enif_")
 foreign erldin {
-  enif_make_binary :: proc(env: ^Env, bin: ^Binary) -> Term ---
-  enif_make_badarg :: proc(env: ^Env) -> Term ---
-  enif_make_int :: proc(env: ^Env, i: c.int) -> Term ---
-  enif_make_ulong :: proc(env: ^Env, i: c.ulong) -> Term ---
-  enif_make_double :: proc(env: ^Env, d: c.double) -> Term ---
-  enif_make_atom :: proc(env: ^Env, name: cstring) -> Term ---
-  enif_make_existing_atom :: proc(env: ^Env, name: cstring, atom: ^Term, encoding: c.uint) -> c.int ---
-  enif_make_tuple :: proc(env: ^Env, n: c.uint, #c_vararg terms: ..Term) -> Term ---
-  enif_make_list_from_array :: proc(env: ^Env, array: [^]Term, count: c.uint) -> Term ---
-  enif_make_string :: proc(env: ^Env, string: cstring, encoding: c.uint) -> Term ---
+  make_binary :: proc(env: ^Env, bin: ^Binary) -> Term ---
+  make_badarg :: proc(env: ^Env) -> Term ---
+  make_int :: proc(env: ^Env, i: c.int) -> Term ---
+  make_ulong :: proc(env: ^Env, i: c.ulong) -> Term ---
+  make_double :: proc(env: ^Env, d: c.double) -> Term ---
+  make_atom :: proc(env: ^Env, name: cstring) -> Term ---
+  make_existing_atom :: proc(env: ^Env, name: cstring, atom: ^Term, encoding: c.uint) -> c.int ---
+  make_tuple :: proc(env: ^Env, n: c.uint, #c_vararg terms: ..Term) -> Term ---
+  make_list_from_array :: proc(env: ^Env, array: [^]Term, count: c.uint) -> Term ---
+  make_string :: proc(env: ^Env, string: cstring, encoding: c.uint) -> Term ---
 
-  enif_get_int :: proc(env: ^Env, term: Term, ip: ^c.int) -> b32 ---
-  enif_get_resource :: proc(env: ^Env, term: Term, resource_type: ^ResourceType, obj: ^rawptr) -> b32 ---
+  get_int :: proc(env: ^Env, term: Term, ip: ^c.int) -> b32 ---
+  get_resource :: proc(env: ^Env, term: Term, resource_type: ^ResourceType, obj: ^rawptr) -> b32 ---
 
   // Resources
-  enif_open_resource_type :: proc(env: ^Env, module: cstring, name: cstring, destructor: ResourceDestructor, flags: ResourceFlags, tried: ^ResourceFlags) -> ^ResourceType ---
-  enif_alloc_resource :: proc(resource_type: ^ResourceType, size: c.size_t) -> ^rawptr ---
-  enif_make_resource :: proc(env: ^Env, resource: ^rawptr) -> Term ---
-  enif_release_resource :: proc(resource: ^rawptr) ---
+  open_resource_type :: proc(env: ^Env, module: cstring, name: cstring, destructor: ResourceDestructor, flags: ResourceFlags, tried: ^ResourceFlags) -> ^ResourceType ---
+  alloc_resource :: proc(resource_type: ^ResourceType, size: c.size_t) -> ^rawptr ---
+  make_resource :: proc(env: ^Env, resource: ^rawptr) -> Term ---
+  release_resource :: proc(resource: ^rawptr) ---
 }
 
 Binary :: struct {
