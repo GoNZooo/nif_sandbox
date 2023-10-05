@@ -28,6 +28,7 @@ tasks:
   build_odin:
     cmds:
       - mkdir -p ./nif/obj/odin
+      - odin build nifs -reloc-mode=pic -build-mode:shared -out:nif/obj/odin/nifs.so
       - odin build slots -reloc-mode=pic -build-mode:shared -out:nif/obj/odin/slots.so
     generates:
       - ./nif/obj/odin/nifs.so
